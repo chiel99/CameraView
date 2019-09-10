@@ -149,7 +149,14 @@ public class Camera1Engine extends CameraEngine implements
 
         // Set parameters that might have been set before the camera was opened.
         LOG.i("onStartEngine:", "Applying default parameters.");
-        Camera.Parameters params = mCamera.getParameters();
+        Camera.Parameters params;
+        try {
+            params = mCamera.getParameters();
+        } catch (Exception e) {
+            LOG.e("onStartEngine:", "Failed to get parameters.");
+            throw new CameraException(e, CameraException.REASON_FAILED_TO_CONNECT);
+        }
+
         mCameraOptions = new CameraOptions(params, getAngles().flip(Reference.SENSOR, Reference.VIEW));
         applyAllParameters(params);
         mCamera.setParameters(params);
