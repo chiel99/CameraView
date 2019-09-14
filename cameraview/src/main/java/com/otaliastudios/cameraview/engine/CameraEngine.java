@@ -1101,7 +1101,15 @@ public abstract class CameraEngine implements
                 stub.facing = mFacing;
                 // Leave the other parameters to subclasses.
                 //noinspection ConstantConditions
-                AspectRatio ratio = AspectRatio.of(getPreviewSurfaceSize(Reference.OUTPUT));
+                AspectRatio ratio;
+                Size previewSurfaceSize = getPreviewSurfaceSize(Reference.OUTPUT);
+                try {
+                    ratio = AspectRatio.of(previewSurfaceSize);
+                } catch (ArithmeticException e) {
+                    LOG.e("takePictureSnapshot", "Error: previewSurfaceSize: ", previewSurfaceSize);
+                    mCallback.dispatchError(new CameraException(e, CameraException.REASON_PICTURE_FAILED));
+                    return;
+                }
                 onTakePictureSnapshot(stub, ratio);
             }
         });
